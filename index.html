@@ -2,9 +2,21 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Generatore Turni – Manutenzione Stradale</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14263a">
+<meta name="color-scheme" content="light">
+<meta name="application-name" content="Turni MNS">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Turni MNS">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>[PROVA] Generatore Turni – Manutenzione Stradale</title>
 <style>
+#splash{display:none!important}
 :root{--navy:#14263a;--navy2:#1f3a56;--orange:#f39c12;--green:#58a65c;--blue:#2878bd;--red:#e85d5d;--yellow:#f5d64e;--pink:#ff8585;--bg:#eef1f5;--line:#d9dfe6;--ink:#1d2733;--mut:#5b6877;
 --w1:132px;--w2:54px;--fs:12px;--rh:30px;--cw:30px;--pad:16px}
 @media(min-width:1600px){:root{--w1:176px;--w2:66px;--fs:14px;--rh:38px;--cw:38px;--pad:20px}body{font-size:15px}}
@@ -43,6 +55,12 @@ button.secondary{background:#f1f4f8}button.dark{background:var(--navy2);border-c
 .schedule td[data-w]{cursor:pointer}.schedule td[data-w]:hover{filter:brightness(.93)}.schedule td.e{background:#fff}.schedule td.redday{background:#fbe3e3}.schedule td.man{box-shadow:inset 0 0 0 2px #172536}
 @media(max-width:750px){:root{--w1:105px;--w2:50px;--fs:10px;--rh:30px}header h1{font-size:1.25em}.tablewrap{max-height:none}}
 @media print{body{background:#fff}header,.controls,.noprint{display:none!important}main{display:block;max-width:none;margin:0;padding:0}.panel{box-shadow:none;border:0;break-inside:avoid}.tablewrap{overflow:visible;max-height:none}.schedule{font-size:8px}.schedule th:first-child,.schedule td:first-child,#schedule th,#schedule td.cnt{position:static!important}}
+#dlgBg{position:fixed;inset:0;z-index:100000;background:#0a141f99;display:none;align-items:center;justify-content:center;padding:20px}
+#dlgBg.on{display:flex}
+#dlg{background:#fff;border-radius:14px;padding:22px 20px 16px;max-width:380px;width:100%;box-shadow:0 12px 40px #0006;border-top:4px solid var(--orange)}
+#dlg p{margin:0 0 18px;font-size:1.02em;line-height:1.45;color:var(--ink);white-space:pre-line}
+#dlg .db{display:flex;gap:10px;justify-content:flex-end}
+#dlg .db button{min-width:92px}
 #menu{position:fixed;z-index:1000;display:none;background:#fff;border:1px solid #c5ced8;border-radius:10px;box-shadow:0 8px 24px #0003;padding:6px;min-width:210px;max-width:92vw}
 #menu .mt{font-size:11px;color:#526170;padding:4px 8px 6px;font-weight:700}
 #menu button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:6px;font-weight:600;min-height:38px}
@@ -132,13 +150,71 @@ button.secondary:hover{border-color:#9fb0c2;background:#e9eef4}
 @media(max-width:750px){.tabs button{font-size:.8em}.ddbtn{min-width:0;width:100%}.dd{flex:1 1 100%}.pairbox .primary{flex:1 1 100%}}
 #pairMain .panel{overflow:visible}#pairMain .panel>h3{border-radius:10px 10px 0 0}
 .ddlist{max-height:70vh;min-width:22em}
+
+/* ===== PWA: splash, login, sicurezza area, stato cloud ===== */
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+.locked>header,.locked>nav,.locked>main,.locked>footer{display:none!important}
+.appbar{padding-top:calc(12px + env(safe-area-inset-top,0px));padding-left:max(clamp(14px,2vw,48px),env(safe-area-inset-left,0px));padding-right:max(clamp(14px,2vw,48px),env(safe-area-inset-right,0px))}
+.statusbar{height:calc(32px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px)}
+body{padding-bottom:calc(42px + env(safe-area-inset-bottom,0px))}
+.statusbar #syncStatus{display:inline!important;color:#cfdae6;font-weight:600}
+.statusbar #syncStatus.ok{color:#8fd694}.statusbar #syncStatus.wait{color:#f5d64e}.statusbar #syncStatus.err{color:#ff9b9b}
+.logoutbtn{background:#ffffff14;border:1px solid #ffffff26;color:#fff;padding:.5em .9em;font-size:.85em}
+@media(max-width:750px){.statusbar #sbMan{display:none}.logoutbtn{padding:.45em .7em}}
+#splash{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:auto;
+ background:radial-gradient(ellipse at 50% 28%,#27496b 0,#14263a 55%,#0b1828 100%);color:#fff;
+ padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));
+ transition:opacity .55s ease,visibility .55s ease}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.sp-inner{display:flex;flex-direction:column;align-items:center;text-align:center;width:min(380px,100%);margin:auto}
+.sp-logo{width:132px;height:132px;border-radius:30px;box-shadow:0 14px 40px #0008,0 0 0 1px #ffffff1f;animation:spIn .8s cubic-bezier(.2,.8,.2,1) both}
+.sp-inner h1{margin:26px 0 0;font-size:1.9em;line-height:1.1;font-weight:850;letter-spacing:3px;animation:spUp .8s .15s both}
+.sp-inner h1 b{color:var(--orange);font-weight:850}
+.sp-rule{width:64px;height:4px;border-radius:2px;background:var(--orange);margin:16px 0 12px;animation:spUp .8s .25s both}
+.sp-sub{margin:0;color:#b9c8d8;font-size:.95em;letter-spacing:.4px;animation:spUp .8s .3s both}
+.sp-bar{width:180px;height:4px;border-radius:2px;background:#ffffff22;margin-top:34px;overflow:hidden;animation:spUp .8s .4s both}
+.sp-bar i{display:block;height:100%;width:40%;border-radius:2px;background:var(--orange);animation:spBar 1.2s ease-in-out infinite}
+.sp-msg{margin:12px 0 0;font-size:.82em;color:#8ea2b6;min-height:1.3em}
+#loginForm{width:100%;margin-top:26px;display:flex;flex-direction:column;gap:10px;text-align:left;animation:spUp .5s both}
+#loginForm label{color:#b9c8d8;font-size:.72em;letter-spacing:.8px;text-transform:uppercase}
+#loginForm input{font-size:16px;padding:.8em .9em;background:#ffffff12;border:1px solid #ffffff33;color:#fff;width:100%}
+#loginForm input::placeholder{color:#8ea2b6}
+#loginForm input:focus{outline:2px solid #f39c1288;border-color:var(--orange)}
+#loginForm button.primary{margin-top:6px;padding:.9em;font-size:1em}
+#loginForm .lnk{background:none;border:0;color:#b9c8d8;font-weight:600;font-size:.85em;text-decoration:underline;padding:.4em}
+#loginErr{min-height:1.2em;font-size:.88em;color:#ff9b9b;margin:0}
+#loginErr.okmsg{color:#8fd694}
+#cfgErr{margin-top:22px;font-size:.88em;background:#e85d5d22;border:1px solid #e85d5d66;border-radius:10px;padding:10px 12px;color:#ffd0d0}
+@keyframes spIn{from{opacity:0;transform:scale(.7) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes spUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes spBar{0%{margin-left:-40%}100%{margin-left:100%}}
+@media(prefers-reduced-motion:reduce){.sp-logo,.sp-inner h1,.sp-rule,.sp-sub,.sp-bar,.sp-bar i{animation:none}}
 </style>
 </head>
 <body>
+<div id="splash" role="status" aria-live="polite">
+ <div class="sp-inner">
+  <img class="sp-logo" src="icon-512.png" alt="" width="132" height="132">
+  <h1>MANUTENZIONE<br><b>STRADALE</b></h1>
+  <div class="sp-rule"></div>
+  <p class="sp-sub">Gestione turni · San Giovanni · Staffetta</p>
+  <div class="sp-bar" id="spBar"><i></i></div>
+  <p class="sp-msg" id="spMsg">Avvio in corso…</p>
+  <form id="loginForm" hidden autocomplete="on">
+   <div><label for="lgEmail">Email amministratore</label><input id="lgEmail" type="email" name="email" autocomplete="username" inputmode="email" required placeholder="nome@esempio.it"></div>
+   <div><label for="lgPass">Password</label><input id="lgPass" type="password" name="password" autocomplete="current-password" required placeholder="••••••••"></div>
+   <p id="loginErr"></p>
+   <button class="primary" id="lgBtn" type="submit">ACCEDI</button>
+   <button class="lnk" id="lgReset" type="button">Password dimenticata?</button>
+  </form>
+  <div id="cfgErr" hidden></div>
+ </div>
+</div>
 <header class="appbar">
  <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#14263a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15h3"/></svg></div>
   <div><h1>Gestione Turni <span>Manutenzione Stradale</span></h1><p>San Giovanni · Staffetta · 23 operatori</p></div></div>
  <div class="monthnav"><button id="prevM" title="Mese precedente">‹</button><div id="monthLabel">—</div><button id="nextM" title="Mese successivo">›</button></div>
+ <button id="logout" class="logoutbtn" title="Esci dall'account" hidden>⎋ Esci</button>
 </header>
 <nav class="tabs noprint"><button id="tabPC" class="on">Turni PC</button><button id="tabMob">Turni smartphone</button><button id="tabPair">Coppie fisse</button></nav>
 <main id="ctrlMain">
@@ -148,7 +224,7 @@ button.secondary:hover{border-color:#9fb0c2;background:#e9eef4}
   <div class="field"><label for="month">MESE</label><select id="month"></select></div>
   <div class="field"><label for="year">ANNO</label><input id="year" type="number" min="2024" max="2040" value="2026" style="width:100px"></div>
   <div class="field"><label>FESTIVI DEL MESE (automatici)</label><span id="autohol" class="note" style="margin:0;padding:.6em 0;font-size:.9em"></span></div>
-  <div class="field"><label for="wmode">NOTTI WEEKEND</label><select id="wmode"><option value="1">1 sabato + 1 domenica</option><option value="2" selected>Almeno 2 (sab/dom indifferenti)</option><option value="3">Almeno 1</option></select></div>
+  <div class="field"><label for="wmode">NOTTI WEEKEND</label><select id="wmode"><option value="1">1 sabato + 1 domenica</option><option value="2">Almeno 2 (sab/dom indifferenti)</option><option value="3">Almeno 1</option><option value="4" selected>Almeno 2, la 3ª a rotazione (2 sab + 1 dom o 2 dom + 1 sab)</option></select></div>
   <div class="field"><label for="lastnight">NOTTE ULTIMO GIORNO MESE PREC. (opz.)</label><input id="lastnight" type="text" placeholder="cognomi separati da virgola" style="width:220px"></div>
   </div></div>
   <div class="group"><div class="gt">Generazione</div><div class="row">
@@ -158,14 +234,14 @@ button.secondary:hover{border-color:#9fb0c2;background:#e9eef4}
    <button class="secondary" id="clearAll">SVUOTA TUTTO</button>
   </div></div>
   <div class="group"><div class="gt">Dati e stampa</div><div class="row">
-   <button class="dark" id="backup" title="Salva in un file tutti i mesi, lo storico e le impostazioni">SALVA BACKUP</button>
+   <button class="dark" id="backup" title="Salva in un file tutti i mesi, lo storico e le impostazioni (copia di sicurezza extra)">SALVA BACKUP</button>
    <button class="dark" id="restore" title="Ripristina un backup salvato in precedenza">RIPRISTINA BACKUP</button>
    <input type="file" id="restoreFile" accept=".json,application/json" hidden>
    <button class="secondary" id="pdf">SCARICA PDF</button>
    <button class="secondary" id="resetHist">AZZERA STORICO</button>
   </div></div>
  </div>
- <p class="note">I nominativi e le sedi sono preimpostati. Le notti nel weekend/festivi sono distribuite il più equamente possibile e il generatore ricorda i mesi precedenti (salvati in questo browser): chi ne ha fatte di più nei 3 mesi prima viene alleggerito. Il generatore cerca di distribuire le notti consentendo al massimo due notti consecutive, assegna il riposo dopo ogni sequenza e controlla il totale mensile.</p>
+ <p class="note">I nominativi e le sedi sono preimpostati. Le notti nel weekend/festivi sono distribuite il più equamente possibile e il generatore ricorda i mesi precedenti (salvati e sincronizzati nel cloud su tutti i tuoi dispositivi): chi ne ha fatte di più nei 3 mesi prima viene alleggerito. Il generatore cerca di distribuire le notti consentendo al massimo due notti consecutive, assegna il riposo dopo ogni sequenza e controlla il totale mensile.</p>
 </section></main>
 <main id="pcMain">
 <section class="panel">
@@ -189,14 +265,15 @@ button.secondary:hover{border-color:#9fb0c2;background:#e9eef4}
  <div id="pairList"></div></section></main>
 <main id="mobMain" hidden><section class="panel"><h3>Turni smartphone</h3><div id="mobBody"></div></section></main>
 <div id="menu"></div>
-<footer class="statusbar noprint"><span id="sbMonth"></span><span id="sbEsito"></span><span id="sbMan"></span><span class="sp"></span><span>Dati salvati in questo browser · usa SALVA BACKUP per conservarli</span></footer>
+<div id="dlgBg"><div id="dlg" role="alertdialog" aria-modal="true"><p id="dlgMsg"></p><div class="db"><button class="secondary" id="dlgNo">Annulla</button><button class="primary" id="dlgOk">OK</button></div></div></div>
+<footer class="statusbar noprint"><span id="sbMonth"></span><span id="sbEsito"></span><span id="sbMan"></span><span class="sp"></span><span id="syncStatus">☁ Avvio…</span></footer>
 <script>
 const SG=["NOCERINO","FIUME","VICEDOMINI","RUSSO E.","ESPOSITO D.","TROMBETTA","SEMONELLA","DE LELLA","PICCIRILLO","LOMBARDO","ESPOSITO G.","MILO","GAS","PICALE","SECONDULFO","TAVOLOZZA"];
 const ST=["COSTABILE L.","PENNACCHIO","GUARRACINO","DE CICCO","PICCOLO","DELLA VOLPE","MARZANO"];
 const all=[...SG,...ST], W=all.length, names=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 const DOW=["D","L","M","M","G","V","S"];
 const $=id=>document.getElementById(id); names.forEach((n,i)=>$("month").add(new Option(n,i)));
-$("month").value=10;
+$("month").value=new Date().getMonth();$("year").value=new Date().getFullYear();
 // Festivi nazionali italiani calcolati in automatico (Pasqua/Pasquetta incluse). Il campo manuale serve solo per extra (es. patrono locale).
 function easterDate(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),da=((h+l-7*mm+114)%31)+1;return new Date(y,mo-1,da);}
 function autoHolidays(y,m){
@@ -280,17 +357,18 @@ function solveNights(dates,active,prev,cin,fx,T,wm){
   shuffle(dom).slice(0,Math.max(0,NIGHTS-cnt)).forEach(d=>{row[d]=1;(isSG?sgCnt:stCnt)[d]++;});
   n.push(row);
  }
+ const pmax=Math.max(...prev.slice(0,NS));
  function wcost(row,w){
-  let c=0,sat=0,sun=0,free=0,freeSat=0;const f=fx[w];
+  let c=0,sat=0,sun=0,hol=0,free=0,freeSat=0;const f=fx[w];
   if(cin.c1[w]&&row[0]){c+=cin.c2[w]?10:2;if(row[1])c+=10;}
   for(let d=0;d<D;d++){
    const nn=row[d],pn=d>0?row[d-1]:cin.c1[w],autoR=!nn&&pn&&f[d]==="";
    if(nn&&d+2<D&&row[d+1]&&row[d+2])c+=10;
    if(nn&&d+1<D&&(f[d+1]==="M"||f[d+1]==="S"))c+=10;
-   if(nn){if(dates[d].sat)sat++;if(dates[d].sun)sun++;}
+   if(nn){if(dates[d].sat)sat++;if(dates[d].sun)sun++;if(wm===4&&dates[d].hol&&!dates[d].sat&&!dates[d].sun)hol++;}
    if(!nn&&!autoR&&f[d]===""){if(!dates[d].red)free++;if(dates[d].sat)freeSat=1;}
   }
-  if(wm===1){if(!sat)c+=10;if(!sun)c+=10;}else c+=10*Math.max(0,(wm===2?2:1)-sat-sun);
+  if(wm===1){if(!sat)c+=10;if(!sun)c+=10;}else if(wm===4){const tot=sat+sun+hol;c+=10*Math.max(0,2-tot);if(w<NS)c+=(4+1.2*(pmax-prev[w]))*Math.max(0,3-tot);if(tot>=3&&(sat+hol===0||sun+hol===0))c+=2;}else c+=10*Math.max(0,(wm===2?2:1)-sat-sun);
   if(!manS[w]&&!freeSat)c+=10;
   const needM=T[w]-NIGHTS-(manS[w]||1)-manM[w];
   c+=10*Math.max(0,needM-free);
@@ -298,7 +376,16 @@ function solveNights(dates,active,prev,cin,fx,T,wm){
  }
  // Staffetta: ogni notte 0 oppure almeno 2 operai (nessun massimo); i giorni attivi (max 21) si adattano ai gruppi. SG: 2 se Staffetta lavora, 4 altrimenti.
  const ndSG=st=>st>=2?2:4,exAvg=extra/D;
- const dayCost=(d,sg,st)=>10*Math.max(0,ndSG(st)-sg)+(st===1?10:0)+(st>2?3*(st-2)**2:0)+0.15*(sg-ndSG(st)-exAvg)**2;
+ const nW=dates.filter(x=>x.sat||x.sun||(wm===4&&x.red)).length;
+ let Zn=0,ew=exAvg,er=exAvg;
+ if(wm===4){const baseWE=dates.reduce((p,x,d)=>p+((x.sat||x.sun||x.red)?base[d]:0),0),elig=dates.filter((x,d)=>active[d]&&!x.red).length;
+  Zn=Math.max(0,Math.min(4,elig,Math.ceil((NS*3-(baseWE+Math.max(0,extra)))/2)));
+  const exT=Math.max(0,extra)+2*Zn;
+  ew=nW?Math.max(0,Math.min((NS*3-baseWE)/nW,exT/nW,4)):0;er=D>nW?(exT-ew*nW)/(D-nW):0;}
+ const exD=dates.map(x=>wm===4?((x.sat||x.sun||x.red)?ew:er):exAvg);
+ const zf=(d,sg,st)=>Zn>0&&st>=2&&!dates[d].red&&sg===0?1:0;
+ const dayCost=(d,sg,st)=>{const z=zf(d,sg,st);return (z?0.5:10*Math.max(0,ndSG(st)-sg))+(st===1?10:0)+(st>2?3*(st-2)**2:0)+(z?0:(wm===4&&dates[d].red?0.8:0.15)*(sg-ndSG(st)-exD[d])**2);};
+ let zc=0;for(let d=0;d<D;d++)zc+=zf(d,sgCnt[d],stCnt[d]);
  let wcs=n.map((row,i)=>wcost(row,i));
  const grp=w=>w<NS?0:1,gn=[NS,W-NS],S1=[0,0],S2=[0,0];
  const wk=n.map(row=>{let c=0;for(let d=0;d<D;d++)if(row[d]&&dates[d].red)c++;return c;});
@@ -321,11 +408,12 @@ function solveNights(dates,active,prev,cin,fx,T,wm){
   const afters=ws.map(i=>wcost(n[i],i)),after=afters.reduce((x,y)=>x+y,0);
   const dd=isSG?(d,c)=>dayCost(d,c,stCnt[d]):(d,c)=>dayCost(d,sgCnt[d],c);
   let dc=after-before+dd(a,cn[a]-k)-dd(a,cn[a])+dd(b,cn[b]+k)-dd(b,cn[b]);
+  let dz=0;if(Zn>0){const sA=isSG?sgCnt[a]-k:sgCnt[a],tA=isSG?stCnt[a]:stCnt[a]-k,sB=isSG?sgCnt[b]+k:sgCnt[b],tB=isSG?stCnt[b]:stCnt[b]+k;dz=zf(a,sA,tA)+zf(b,sB,tB)-zf(a,sgCnt[a],stCnt[a])-zf(b,sgCnt[b],stCnt[b]);dc+=10*(Math.max(0,zc+dz-Zn)-Math.max(0,zc-Zn));}
   const dl=(dates[b].red?1:0)-(dates[a].red?1:0),g=grp(w);let fS1=S1[g],fS2=S2[g];
   if(dl!==0){ws.forEach(i=>{const t2=prev[i]+wk[i];fS2+=(t2+dl)*(t2+dl)-t2*t2;fS1+=dl;});dc+=FAIR*((fS2-fS1*fS1/gn[g])-F(g));}
   if(dc<=0||Math.random()<Math.exp(-dc/T0)){
    if(dl!==0){S1[g]=fS1;S2[g]=fS2;ws.forEach(i=>wk[i]+=dl);}
-   ws.forEach((i,j)=>wcs[i]=afters[j]);cn[a]-=k;cn[b]+=k;
+   ws.forEach((i,j)=>wcs[i]=afters[j]);cn[a]-=k;cn[b]+=k;zc+=dz;
   } else {ws.forEach(i=>{n[i][a]=1;n[i][b]=0;});}
  }
  return {n,sgCnt,stCnt};
@@ -354,7 +442,7 @@ function make(st,fx){
  const active=Array(D).fill(false);act.forEach(d=>active[d]=true);
  const ph=prevTotals(y,m),cin=carryIn(y,m,st.last);let best=null,pre=null;
  {const baseD=dates.map((x,d)=>2+(active[d]?0:2)),extra=SG.length*NIGHTS-baseD.reduce((p,c)=>p+c,0);
-  const cap=dates.reduce((p,x,d)=>p+(x.sat||x.sun?baseD[d]:0),0)+Math.max(0,extra),nec=SG.length*(wm===3?1:2);
+  const cap=dates.reduce((p,x,d)=>p+(x.sat||x.sun||(wm===4&&x.red)?baseD[d]:0),0)+Math.max(0,extra)+(wm===4?8:0),nec=SG.length*(wm===3?1:wm===4?2:2);
   if(cap<nec)pre=`Mese non fattibile con i vincoli attuali: servono ${nec} notti SG nei weekend (secondo la regola weekend scelta) ma ne sono disponibili al massimo ${cap}.`;}
  for(let attempt=0;attempt<(pre?4:25);attempt++){
   const s=solveNights(dates,active,ph.tot,cin,fx,T,wm);
@@ -397,14 +485,17 @@ function build(y,m,dates,weekdays,s,active,act,cin,fx,T,wm){
   if(c.work[w]!==T[w])issues.push(`${all[w]}: ${c.work[w]} giornate lavorate, obiettivo ${T[w]}.`);
   if(c.nights[w]<NIGHTS)issues.push(`${all[w]}: ${c.nights[w]} notti invece di ${NIGHTS}.`);
   if(wm===1){if(c.satN[w]<1)issues.push(`${all[w]}: manca una notte di sabato.`);if(c.sunN[w]<1)issues.push(`${all[w]}: manca una notte di domenica.`);}
+  else if(wm===4){if(c.redN[w]<2)issues.push(`${all[w]}: notti nel weekend/festivi insufficienti (${c.redN[w]}).`);}
   else if(c.satN[w]+c.sunN[w]<(wm===2?2:1))issues.push(`${all[w]}: notti nel weekend insufficienti (${c.satN[w]+c.sunN[w]}).`);
  }
  issues.push(...liveIssues(cells,dates,cin));
+ let zc4=0;
  for(let d=0;d<D;d++){
   let sg=0,st=0;for(let w=0;w<W;w++)if(cells[w][d]==="N"){if(w<SG.length)sg++;else st++;}
   const needSG=st>=2?2:4;
   if(st===1)issues.push(`Il ${dates[d].d}: Staffetta ha 1 solo operatore (servono almeno 2 oppure nessuno).`);
-  if(sg<needSG)issues.push(st>=2?`Il ${dates[d].d}: San Giovanni ha meno di 2 operatori in sede.`:`Il ${dates[d].d}: copertura Staffetta da San Giovanni insufficiente (servono 4 notti SG, ce ne sono ${sg}).`);
+  if(sg<needSG&&wm===4&&st>=2&&sg===0&&!dates[d].red){zc4++;if(zc4>4)issues.push(`Il ${dates[d].d}: troppe notti senza San Giovanni (massimo 4 al mese).`);}
+  else if(sg<needSG)issues.push(st>=2?`Il ${dates[d].d}: San Giovanni ha meno di 2 operatori in sede.`:`Il ${dates[d].d}: copertura Staffetta da San Giovanni insufficiente (servono 4 notti SG, ce ne sono ${sg}).`);
  }
  return {y,m,dates,cells,weekdays,issues,activeDays:[...Array(D).keys()].filter(d=>cells.some((r,w)=>w>=SG.length&&r[d]==="N"))};
 }
@@ -419,6 +510,16 @@ function calc(cells,dates){
 }
 // ---------- Stato per mese, salvataggio e annulla ----------
 const states={};let cur=null;
+// Finestre di dialogo interne (niente "indirizzo dice")
+function dlg(msg,conf){return new Promise(res=>{
+ const bg=$("dlgBg"),ok=$("dlgOk"),no=$("dlgNo");
+ $("dlgMsg").textContent=msg;no.style.display=conf?"":"none";bg.classList.add("on");ok.focus();
+ const done=v=>{bg.classList.remove("on");ok.onclick=no.onclick=bg.onclick=null;document.removeEventListener("keydown",kd,true);res(v);};
+ const kd=e=>{if(e.key==="Escape"){e.preventDefault();done(false);}};
+ document.addEventListener("keydown",kd,true);
+ ok.onclick=()=>done(true);no.onclick=()=>done(false);bg.onclick=e=>{if(e.target===bg)done(!conf);};
+});}
+const askConfirm=m=>dlg(m,true),showMsg=m=>dlg(m,false);
 function loadStore(){try{return JSON.parse(localStorage.getItem(SKEY)||"{}")}catch(e){return {}}}
 function persist(st){try{const s=loadStore();s[st.key]={hol:st.hol,last:st.last,cells:st.cells,man:st.man};localStorage.setItem(SKEY,JSON.stringify(s));}catch(e){}}
 function getState(){
@@ -449,8 +550,8 @@ function setCell(w,d,v){
  const st=cur;if(st.cells[w][d]===v&&st.man[w][d]===(v!==""))return;
  snap(st);st.cells[w][d]=v;st.man[w][d]=v!=="";st.dirty=true;persist(st);renderAll();
 }
-function clearAll(){const st=cur;if(!st.cells.some(r=>r.some(v=>v!==""))){return;}
- if(!confirm("Svuotare tutta la tabella, comprese le selezioni manuali? Puoi annullare con ANNULLA."))return;
+async function clearAll(){const st=cur;if(!st.cells.some(r=>r.some(v=>v!==""))){return;}
+ if(!await askConfirm("Svuotare tutta la tabella, comprese le selezioni manuali? Puoi annullare con ANNULLA."))return;
  snap(st);const D=st.cells[0].length;st.cells=all.map(()=>Array(D).fill(""));st.man=all.map(()=>Array(D).fill(false));st.gen=null;st.dirty=false;persist(st);renderAll();}
 function clearAuto(){const st=cur;if(!st.cells.some((r,w)=>r.some((v,d)=>v!==""&&!st.man[w][d])))return;
  snap(st);st.cells=st.cells.map((r,w)=>r.map((v,d)=>st.man[w][d]?v:""));st.gen=null;st.dirty=false;persist(st);renderAll();}
@@ -583,16 +684,16 @@ function downloadBackup(){
 }
 function restoreBackup(file){
  const r=new FileReader();
- r.onload=()=>{
-  let b;try{b=JSON.parse(r.result)}catch(e){alert("File non valido: non è un backup leggibile.");return;}
+ r.onload=async()=>{
+  let b;try{b=JSON.parse(r.result)}catch(e){await showMsg("File non valido: non è un backup leggibile.");return;}
   const ok=b&&b.app===BK_APP&&b.storico&&typeof b.storico==="object"&&b.fineMese&&typeof b.fineMese==="object"&&b.mesi&&typeof b.mesi==="object";
-  if(!ok){alert("Questo file non è un backup di questa app.");return;}
+  if(!ok){await showMsg("Questo file non è un backup di questa app.");return;}
   const n=Object.keys(b.mesi).length;
-  if(!confirm(`Ripristinare il backup del ${String(b.date||"").slice(0,10)||"data sconosciuta"}? Contiene ${n} mesi. I dati attuali di questo browser verranno sostituiti.`))return;
+  if(!await askConfirm(`Ripristinare il backup del ${String(b.date||"").slice(0,10)||"data sconosciuta"}? Contiene ${n} mesi. I dati attuali di questo browser verranno sostituiti.`))return;
   try{localStorage.setItem(HKEY,JSON.stringify(b.storico));localStorage.setItem(EKEY,JSON.stringify(b.fineMese));localStorage.setItem(SKEY,JSON.stringify(b.mesi));if(Array.isArray(b.coppie))localStorage.setItem(PKEY,JSON.stringify(b.coppie));}
-  catch(e){alert("Impossibile scrivere i dati nel browser.");return;}
+  catch(e){await showMsg("Impossibile scrivere i dati nel browser.");return;}
   Object.keys(states).forEach(k=>delete states[k]);
-  cur=getState();syncInputs(cur);renderAll();renderPairs();alert("Backup ripristinato.");
+  cur=getState();syncInputs(cur);renderAll();renderPairs();showMsg("Backup ripristinato.");
  };
  r.readAsText(file);
 }
@@ -622,7 +723,7 @@ function renderMob(){
   h+=`<div class="bignight">Operai di notte<b>${night.length}</b></div>`;
   h+=sec("n","Notte · San Giovanni",night.filter(([n,w])=>w<SG.length))+sec("n","Notte · Staffetta",night.filter(([n,w])=>w>=SG.length))+sec("","Mattina",g(["M","S"]))+sec("r","Riposo post-notte",g(["R"]))+sec("f","Ferie",g(["F"]));
  }
- h+='<div class="mfoot"><p class="note">Per portare i turni sullo smartphone: sul PC premi SALVA BACKUP, invia il file al telefono e qui premi RIPRISTINA BACKUP.</p></div>';
+ h+='<div class="mfoot"><p class="note">I turni sono sincronizzati automaticamente con il PC: vedi sempre gli stessi dati. Le modifiche si vedono sugli altri dispositivi in pochi secondi.</p></div>';
  $("mobBody").innerHTML=h;
 }
 $("mobBody").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
@@ -659,7 +760,7 @@ function stepMonth(k){let m=+$("month").value+k,y=+$("year").value||2026;if(m<0)
 $("prevM").onclick=()=>stepMonth(-1);$("nextM").onclick=()=>stepMonth(1);
 $("lastnight").onchange=()=>{cur.last=$("lastnight").value;persist(cur);renderAll();};
 $("undo").onclick=undo;$("clearAll").onclick=clearAll;$("clearAuto").onclick=clearAuto;
-$("resetHist").onclick=()=>{if(confirm("Cancellare lo storico delle notti festive dei mesi precedenti?")){try{localStorage.removeItem(HKEY)}catch(e){}alert("Storico azzerato.");}};
+$("resetHist").onclick=async()=>{if(await askConfirm("Cancellare lo storico delle notti festive dei mesi precedenti?")){try{localStorage.removeItem(HKEY)}catch(e){}showMsg("Storico azzerato.");}};
 $("pdf").onclick=downloadPDF;$("backup").onclick=downloadBackup;
 $("restore").onclick=()=>$("restoreFile").click();
 $("restoreFile").onchange=e=>{const f=e.target.files[0];e.target.value="";if(f)restoreBackup(f);};
@@ -671,11 +772,30 @@ $("generate").onclick=()=>{
    const fx=st.cells.map((r,w)=>r.map((v,d)=>st.man[w][d]?v:""));
    const res=make(st,fx);
    st.cells=res.cells;st.gen=res;st.dirty=false;persist(st);
-  }catch(err){st.undo.pop();alert("Errore nella generazione: "+err.message);}
+  }catch(err){st.undo.pop();showMsg("Errore nella generazione: "+err.message);}
   btn.disabled=false;btn.textContent="GENERA TURNI";renderAll();
  },30);
 };
 cur=getState();syncInputs(cur);renderAll();
-
+// Usata da sync.js quando arrivano dati nuovi dal cloud
+window.appReload=function(){Object.keys(states).forEach(k=>delete states[k]);cur=getState();syncInputs(cur);renderAll();renderPairs();};
+</script>
+<script>
+window.__syncBoot=true;
+setTimeout(function(){
+ if(window.__syncBoot)return;
+ var s=document.getElementById("splash");if(!s||s.classList.contains("hide"))return;
+ document.getElementById("spBar").hidden=true;document.getElementById("spMsg").hidden=true;
+ var c=document.getElementById("cfgErr");c.hidden=false;
+ c.innerHTML=location.protocol==="file:"
+  ?"L'app non può essere aperta con doppio clic sul file.<br>Aprila dall'indirizzo di GitHub Pages (https://…github.io/…)."
+  :"Impossibile caricare <b>sync.js</b>.<br>Controlla che tutti i file siano stati caricati su GitHub (sync.js, firebase-config.js, cartella icons) e ricarica la pagina.";
+ c.innerHTML+='<br><br><button class="primary" onclick="location.reload()">RIPROVA</button>';
+},6000);
+</script>
+<script>
+if(false&&"serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){
+ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
 </script>
 </body></html>
